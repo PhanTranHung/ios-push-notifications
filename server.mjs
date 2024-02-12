@@ -20,12 +20,9 @@ app.get('/get-vapid-pubkey', async (req, res) => {
   res.send(process.env.VAPID_PUBLIC_KEY);
 })
 
-app.get('/send-notification', async (req, res) => {
+app.post('/send-notification', async (req, res) => {
   try {
-    await webpush.sendNotification(subscriptionData, JSON.stringify({
-      title: "Hello World",
-      body: "Notification sent from backend"
-    }));
+    await webpush.sendNotification(subscriptionData, JSON.stringify(req.body));
     res.sendStatus(200);
   } catch(err) {
     console.error(err);
