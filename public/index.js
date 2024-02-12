@@ -7,41 +7,37 @@ async function run() {
     }
   );
 
-  const button = document.getElementById("subscribe");
+  const subscribe = document.getElementById("subscribe");
+  const sendNoti = document.getElementById("send-noti");
 
-  const areNotificationsGranted = window.Notification.permission === "granted";
-  if (areNotificationsGranted) {
-    button.innerText = "Send Notification";
+  sendNoti.addEventListener("click", async () => {
+    await fetch("/send-notification");
+  });
 
-    button.addEventListener("click", async () => {
-      await fetch("/send-notification");
-    });
-  } else {
-    button.addEventListener("click", async () => {
-      // Triggers popup to request access to send notifications
-      const result = await window.Notification.requestPermission();
+  subscribe.addEventListener("click", async () => {
+    // Triggers popup to request access to send notifications
+    const result = await window.Notification.requestPermission();
 
-      // If the user rejects the permission result will be "denied"
-      if (result === "granted") {
-        const subscription = await registration.pushManager.subscribe({
-          // TODO: Replace with your public vapid key
-          applicationServerKey:
-            "BFkG2HKrQ3BYTS_4z1S1pRwNoX4vvQhCwi3q9Hum7nQ8p9FHU3nLAjzmGWet_63jkLD2XXFp2rgranujXvCJd4k",
-          userVisibleOnly: true,
-        });
+    // If the user rejects the permission result will be "denied"
+    if (result === "granted") {
+      const vapidPubkey = await fetch("/get-vapid-pubkey").then((res) =>
+        res.text()
+      );
+      const subscription = await registration.pushManager.subscribe({
+        // TODO: Replace with your public vapid key
+        applicationServerKey: vapidPubkey,
+        userVisibleOnly: true,
+      });
 
-        await fetch("/save-subscription", {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(subscription),
-        });
-
-        window.location.reload();
-      }
-    });
-  }
+      await fetch("/save-subscription", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(subscription),
+      });
+    }
+  });
 }
 
 run();

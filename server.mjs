@@ -16,6 +16,10 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 )
 
+app.get('/get-vapid-pubkey', async (req, res) => {
+  res.send(process.env.VAPID_PUBLIC_KEY);
+})
+
 app.get('/send-notification', async (req, res) => {
   try {
     await webpush.sendNotification(subscriptionData, JSON.stringify({
