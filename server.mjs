@@ -14,6 +14,7 @@ app.use(express.json());
 
 let subscriptionData = null;
 
+webpush.setGCMAPIKey(process.env.GCM_API_KEY)
 webpush.setVapidDetails(
   `mailto:${process.env.VAPID_MAILTO}`,
   process.env.VAPID_PUBLIC_KEY,
